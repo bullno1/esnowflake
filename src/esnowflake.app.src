@@ -1,0 +1,11 @@
+{application, esnowflake, [
+	{description, ""},
+	{vsn, "1"},
+	{registered, []},
+	{applications, [kernel, stdlib]},
+	{mod, {esnowflake_app, []}},
+	{env, [
+		{worker_id, 0},
+		{epoch, 1369440000000}
+	]}
+]}.
