@@ -3,8 +3,8 @@
 -export([start_link/1]).
 -export([new_id/0]).
 -export([id_to_string/1, string_to_id/1]).
--export([id_to_bstring/1, bstring_to_id/1]).
--export([id_timestamp/1]).
+-export([id_to_bstring/1, bstring_to_id/1, is_bstring_id/1]).
+-export([id_timestamp/1, id_custom_timestamp/1]).
 -export([init/1, handle_cast/2, handle_call/3,
          handle_info/2, terminate/2, code_change/3]).
 -export_type([id/0]).
@@ -19,7 +19,7 @@
 	sequence = 0
 }).
 
--spec start_link(string()) -> {ok, pid()} | {error, Reason :: any()}.
+-spec start_link(list()) -> {ok, pid()} | {error, Reason :: any()}.
 start_link(Opts) ->
 	gen_server:start_link({local, ?MODULE}, ?MODULE, Opts, []).
 
@@ -49,6 +49,13 @@ bstring_to_id(Str) -> string_to_id(binary_to_list(Str)).
 -spec id_timestamp(id()) -> integer().
 id_timestamp(<<Timestamp:42/integer, _:22/bitstring>>) ->
 	Timestamp + ets:lookup_element(esnowflake, epoch, 2).
+
+-spec id_custom_timestamp(id()) -> integer().
+id_custom_timestamp(<<Timestamp:42/integer, _:22/bitstring>>) -> Timestamp.
+
+-spec is_bstring_id(binary()) -> boolean().
+is_bstring_id(Bin) when is_binary(Bin), byte_size(Bin) =< 11 -> true;
+is_bstring_id(_) -> false.
 
 %% Private
 init(Opts) ->
